@@ -22,8 +22,8 @@ object Day2 {
   def getCommands(filePath: String): List[Command] = {
     val bufferedSource = io.Source.fromFile(filePath)
     try bufferedSource.getLines().map { str =>
-      val strArray = str.split(" ")
-      Command(Direction.toDirection(strArray(0)), strArray(1).toInt)
+      val Array(dir, pos) = str.split(" ")
+      Command(Direction.toDirection(dir), pos.toInt)
     }.toList
     finally bufferedSource.close()
   }
@@ -39,7 +39,20 @@ object Day2 {
     }
     h * d
   }
+
+  def getPositionWithAim(commands: List[Command]): Long = {
+    val (h, d, _) = commands.foldLeft((0, 0, 0)) {
+      case ((horizontalPosition, depth, aim), command) =>
+        command.dir match {
+          case Direction.Forward => (horizontalPosition + command.pos, depth + (command.pos * aim), aim)
+          case Direction.Up => (horizontalPosition, depth, aim - command.pos)
+          case Direction.Down => (horizontalPosition, depth, aim + command.pos)
+        }
+    }
+    h * d
+  }
 }
+
 
 /**
  * val commands = Day2.getCommands

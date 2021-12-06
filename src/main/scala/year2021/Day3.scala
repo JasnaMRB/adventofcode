@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 
 object Day3 {
   private val numIndices: Int = 12
+
   def getReport(filePath: String): List[String] = {
     val bufferedSource = io.Source.fromFile(filePath)
     try bufferedSource.getLines().toList
@@ -11,23 +12,21 @@ object Day3 {
   }
 
   private def binaryToDecimal(str: String): Double = {
-    str.foldLeft(0.0, numIndices) {
-      case ((total, power), char) =>
-        val nextTotal = if (char == '1') scala.math.pow(2, power) else 0.0
+    str.foldLeft(0.0, numIndices - 1) {
+      case ((total, power), char) => val nextTotal = if (char == '1') scala.math.pow(2, power) else 0.0
         (total + nextTotal, power - 1)
     }._1
   }
 
   def getPowerConsumption(filePath: String): Double = {
     val report = getReport(filePath)
-    val total = report.size
     val counts = report.foldLeft(List.iterate(0, numIndices)(_ => 0)) {
       case (acc, line) =>
         line.zipWithIndex.foldLeft(acc) {
           case (a, (char, index)) => a.updated(index, a(index) + char.asDigit)
         }
     }.map{ ones =>
-      val zeroes = total - ones
+      val zeroes = report.size - ones
       val most = if (ones > zeroes) 1 else 0
       val least = if (most == 1) 0 else 1
       (most, least)
@@ -51,9 +50,9 @@ object Day3 {
       }
       binaryToDecimal(traverse(report, index = 0))
     }
-    val oxygenGeneratorRating = getRating((a, b) => if (a.size >= b.size) a else b)
+    val o2GeneratorRating = getRating((a, b) => if (a.size >= b.size) a else b)
     val co2ScrubberRating = getRating((a, b) => if (b.size <= a.size) b else a)
-    oxygenGeneratorRating * co2ScrubberRating
+    o2GeneratorRating * co2ScrubberRating
   }
 }
 
